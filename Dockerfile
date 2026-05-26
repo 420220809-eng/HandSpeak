@@ -27,6 +27,7 @@ EXPOSE 7860
 # Set environment variables
 ENV PORT=7860
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 # Run the application
 CMD uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-7860}
