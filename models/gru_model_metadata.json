@@ -1,0 +1,53 @@
+{
+  "model_version": "2.0",
+  "model_type": "GRU",
+  "sequence_length": 30,
+  "num_features": 126,
+  "num_classes": 24,
+  "sign_classes": [
+    "اسم",
+    "السلام",
+    "انا",
+    "انت",
+    "ايه",
+    "بابا",
+    "بيت",
+    "جامعة",
+    "حب",
+    "سعيد",
+    "شكرا",
+    "طفل",
+    "عامل",
+    "عليكم",
+    "عمر",
+    "عندك",
+    "كويس",
+    "ماما",
+    "مساعدة",
+    "مسجد",
+    "مهم",
+    "ياكل",
+    "يسمع",
+    "يفكر"
+  ],
+  "confidence_threshold": 0.7,
+  "stability_threshold": 15,
+  "input_shape": [
+    1,
+    30,
+    126
+  ],
+  "output_shape": [
+    1,
+    24
+  ],
+  "preprocessing": {
+    "normalization": "per_frame",
+    "padding": "zero_padding",
+    "features_per_hand": 63,
+    "landmarks_per_hand": 21,
+    "coordinates_per_landmark": 3
+  },
+  "flutter_compatible": true,
+  "requires_flex_delegate": false
+}

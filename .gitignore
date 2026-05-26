@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Testing
+test_*.py
+*_test.py
+example_*.py
+start_*.bat
+*.bat
+
+# Dataset (too large for deployment)
+our_dataset/
+data/dataset/
+data/videos/
+
+# Documentation (not needed on server)
+*_GUIDE.md
+*_SUMMARY.md
+*_COMPLETE.md
+*_CHECKLIST.md
+*_ARCHITECTURE.md
+*_COMMANDS.md
+*_QUICKSTART.md
+*_REFERENCE.txt
+*_UPDATE.md
+CHATGPT_PROMPT.md
+START_HERE*.md
+MANUAL_TEST_GUIDE.md
+
+# Training files (not needed on server)
+train_*.py
+prepare_data.py
+extract_landmarks.py
+run_custom_dataset.py
+yt_download.py
+yt_links.csv
+
+# Test files
+test_*.py
+example_*.py
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Model checkpoints (keep only final model)
+models/best_model.h5
+models/best_lstm_model.h5
+models/sign_lstm_model.h5
+models/sign_lstm_model.tflite
+
+# Keep these files for deployment:
+# !models/sign_gru_model.h5
+# !models/gru_model_metadata.json
+# !data/processed/label_encoder.pkl
+# !data/processed/sign_classes.pkl
