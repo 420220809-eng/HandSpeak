@@ -11,8 +11,8 @@ python-multipart>=0.0.6  # Required for file uploads
 pydantic>=2.0.0
 
 # Deep Learning
-tensorflow>=2.10.0
-keras>=2.10.0
+tensorflow>=2.10.0,<2.20.0
+keras>=2.10.0,<3.13.0
 
 # Computer Vision
 mediapipe==0.10.9
