@@ -57,7 +57,7 @@ class SignLanguagePredictor:
     def extract_landmarks_from_video(self, video_path: str) -> Tuple[np.ndarray, Dict[str, Any]]:
         """
         Extract hand landmarks from video file using MediaPipe
-        This uses your existing landmark extraction logic
+        OPTIMIZED: Processes every 2nd frame and limits to 60 frames max
         
         Args:
             video_path: Path to video file
@@ -76,7 +76,16 @@ class SignLanguagePredictor:
         if not cap.isOpened():
             raise ValueError(f"Cannot open video file: {video_path}")
         
-        # Storage for landmarks
+        # Get video properties for optimization
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_video_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        
+        # OPTIMIZATION: Skip frames for faster processing
+        # Process every 2nd frame if video is long
+        frame_skip = 2 if total_video_frames > 60 else 1
+        max_frames = 60  # Limit processing to 60 frames max
+        
+        # Storage for landmarks (pre-allocate for speed)
         left_hand_landmarks = []
         right_hand_landmarks = []
         
@@ -85,20 +94,36 @@ class SignLanguagePredictor:
         frames_with_hands = 0
         frames_with_left = 0
         frames_with_right = 0
+        frame_count = 0
         
         try:
             # Initialize MediaPipe Holistic
             with mp.solutions.holistic.Holistic(
                 min_detection_confidence=self.min_detection_confidence,
-                min_tracking_confidence=self.min_tracking_confidence
+                min_tracking_confidence=self.min_tracking_confidence,
+                model_complexity=0  # OPTIMIZATION: Use fastest model (0 = lite)
             ) as holistic:
                 
-                while cap.isOpened():
+                while cap.isOpened() and total_frames < max_frames:
                     ret, frame = cap.read()
                     if not ret:
                         break
                     
+                    frame_count += 1
+                    
+                    # OPTIMIZATION: Skip frames
+                    if frame_count % frame_skip != 0:
+                        continue
+                    
                     total_frames += 1
+                    
+                    # OPTIMIZATION: Resize frame for faster processing
+                    height, width = frame.shape[:2]
+                    if width > 640:
+                        scale = 640 / width
+                        new_width = 640
+                        new_height = int(height * scale)
+                        frame = cv2.resize(frame, (new_width, new_height))
                     
                     # Make detections using your existing function
                     image, results = mediapipe_detection(frame, holistic)
@@ -128,14 +153,10 @@ class SignLanguagePredictor:
         if frames_with_hands == 0:
             raise ValueError("No hands detected in any frame of the video")
         
-        # Combine left and right hand landmarks
-        # Each frame: 63 (left) + 63 (right) = 126 features
-        combined_landmarks = []
-        for left, right in zip(left_hand_landmarks, right_hand_landmarks):
-            combined = np.array(left + right)  # Concatenate
-            combined_landmarks.append(combined)
-        
-        landmarks_array = np.array(combined_landmarks)
+        # OPTIMIZATION: Use numpy operations instead of list comprehension
+        left_array = np.array(left_hand_landmarks)
+        right_array = np.array(right_hand_landmarks)
+        landmarks_array = np.concatenate([left_array, right_array], axis=1)
         
         # Metadata about extraction
         metadata = {
@@ -144,7 +165,9 @@ class SignLanguagePredictor:
             'frames_with_left': frames_with_left,
             'frames_with_right': frames_with_right,
             'hand_detection_rate': round(frames_with_hands / total_frames * 100, 2),
-            'extracted_shape': landmarks_array.shape
+            'extracted_shape': landmarks_array.shape,
+            'frame_skip': frame_skip,
+            'sequence_length': self.sequence_length
         }
         
         return landmarks_array, metadata
